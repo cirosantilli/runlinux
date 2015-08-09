@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -eux
+
+minimal_path="$(dirname "${BASH_SOURCE[0]}"})/minimal/src"
+rootfs_path="${minimal_path}/work/rootfs.cpio.gz"
+bzimage_path="${KBUILD_OUTPUT}${KBUILD_OUTPUT:+/}arch/x86/boot/bzImage"
+
+if [ ! -e "$rootfs_path" ]; then
+  (
+    # BusyBox also uses KBUILD_OUTPUT...
+    unset KBUILD_OUTPUT
+    cd "$minimal_path"
+    ./0_prepare.sh
+    ./3_get_busybox.sh
+    ./4_build_busybox.sh
+    ./5_generate_rootfs.sh
+    ./6_pack_rootfs.sh
+    cd -
+  )
+fi
+if [ ! -e "$KBUILD_OUTPUT/.config" ]; then
+  make mrproper
+  make defconfig
+fi
+make bzImage -j $(grep ^processor /proc/cpuinfo | wc -l)
+qemu-system-x86_64 -kernel "$bzimage_path" -initrd "$rootfs_path"
