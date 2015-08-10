@@ -24,4 +24,7 @@ if [ ! -e "$KBUILD_OUTPUT/.config" ]; then
   make defconfig
 fi
 make bzImage -j $(grep ^processor /proc/cpuinfo | wc -l)
-qemu-system-x86_64 -kernel "$bzimage_path" -initrd "$rootfs_path"
+qemu-system-x86_64 -enable-kvm -kernel "$bzimage_path" -initrd "$rootfs_path"
+# TODO use GDB when -g is passed. We should also compile with debug symbols by defalt.
+#qemu-system-x86_64 -enable-kvm -kernel "$bzimage_path" -initrd "$rootfs_path" -S -s &>/dev/null &
+#gdb -ex 'target remote localhost:1234'

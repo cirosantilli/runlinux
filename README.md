@@ -8,13 +8,13 @@ cd into a Linux kernel source tree, run one line of bash, and get a running QEMU
 	git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 	cd linux
 	git checkout v4.1
-	../runlinux/run
+	../runlinux/runlinux
 
 It takes a while the first time, but further runs will be faster.
 
 Then hack the kernel source to your liking, and run:
 
-	../runlinux/run
+	../runlinux/runlinux
 
 again to try it out.
 
@@ -22,7 +22,7 @@ Out-of-tree build with custom configuration:
 
     export KBUILD_OUTPUT="$(pwd)/../build"
     make menuconfig
-	../runlinux/run
+	../runlinux/runlinux
 
 If an existing configuration is not found, `make defconfig` is used. If found, it is used and left untouched.
 
