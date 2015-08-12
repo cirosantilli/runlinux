@@ -29,3 +29,24 @@ If an existing configuration is not found, `make defconfig` is used. If found, i
 Based on: <https://github.com/ivandavidov/minimal>
 
 Tested in Ubuntu 14.04 AMD64.
+
+## Options
+
+## g
+
+TODO this is currently broken: <https://sourceware.org/bugzilla/show_bug.cgi?id=13984>
+
+Debug the kernel on GDB:
+
+	../runlinux/runlinux -g
+
+This will set the `CONFIG_DEBUG_INFO` configuration and rebuild the kernel if necessary.
+
+It runs QEMU on the background of the current shell, and opens GDB there.
+
+You are now ready to debug, e.g.:
+
+    # Has to be hardware breakpoint. TODO why https://bugs.launchpad.net/ubuntu/+source/qemu-kvm/+bug/901944/comments/12
+    hbreak start_kernel
+    list
+    continue
