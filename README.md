@@ -8,7 +8,8 @@ Tested in Ubuntu 14.04 AMD64, QEMU 2.0.0.
 
 ## Install
 
-    sudo apt-get install qemu
+    sudo apt-get install git qemu
+    sudo apt-get build-dep busybox linux-image-$(uname -r)
     mkdir -p ~/bin
     cd ~/bin
     git clone --recursive https://github.com/cirosantilli/runlinux
