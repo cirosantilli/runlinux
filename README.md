@@ -1,20 +1,32 @@
 # Runlinux
 
-cd into a Linux kernel source tree, run one line of bash, and get a running QEMU VM with BusyBox.
+cd into a Linux kernel source tree, run one command, and get a running QEMU VM with BusyBox.
+
+Based on: <https://github.com/ivandavidov/minimal>
+
+Tested in Ubuntu 14.04 AMD64, QEMU 2.0.0.
+
+## Install
 
     sudo apt-get install qemu
-    cd /tmp
+    mkdir -p ~/bin
+    cd ~/bin
     git clone --recursive https://github.com/cirosantilli/runlinux
+    echo 'PATH="$PATH:'$(pwd)'/runlinux"' >> ~/.bashrc
+    . ~/.bashrc
+
+## Examples
+
 	git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 	cd linux
-	git checkout v4.1
-	../runlinux/runlinux
+	git checkout v4.2
+	runlinux
 
-It takes a while the first time, but further runs will be faster.
+It takes a while the first time because things have to be built, but later runs will be faster.
 
 Then hack the kernel source to your liking, and run:
 
-	../runlinux/runlinux
+	runlinux
 
 again to try it out.
 
@@ -22,13 +34,15 @@ Out-of-tree build with custom configuration:
 
     export KBUILD_OUTPUT="$(pwd)/../build"
     make menuconfig
-	../runlinux/runlinux
+	runlinux
 
-If an existing configuration is not found, `make defconfig` is used. If found, it is used and left untouched.
+If an existing configuration is not found at `KBUILD_OUTPUT`, `make defconfig` is used. If found, it is used and left untouched.
 
-Based on: <https://github.com/ivandavidov/minimal>
+Pass extra options to QEMU:
 
-Tested in Ubuntu 14.04 AMD64.
+    runlinux -- -bios ~/path/to/OVMF.fd
+
+This for example uses the [OVMF UEFI X64 r15214](https://sourceforge.net/projects/edk2/files/OVMF/OVMF-X64-r15214.zip/download) instead of the default BIOS.
 
 ## Options
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eux
+set -eu
 
 # Constants.
 minimal_path="$(dirname "${BASH_SOURCE[0]}"})/minimal/src"
@@ -21,8 +21,8 @@ QEMU ARGS are passed directly to QEMU in addition to other default arguments.
 
 OPTIONS:
 
-  -g             debug the kernel with GDB
-  -h             show this help
+  -g  debug the kernel with GDB
+  -h  show this help
 " 1>&2
 }
 
