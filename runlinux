@@ -13,12 +13,16 @@ config_path="${kbuild_output_prefix}.config"
 # TODO cat README.
 usage() {
   F="$(basename "$0")"
-  echo "$F [OPTION]...
+  echo "$F [OPTION]... -- [QEMU ARGS]..
 
 Run the Linux kernel from source in QEMU in a one line of Bash.
 
-  -g  debug the kernel with GDB
-  -h  show this help
+QEMU ARGS are passed directly to QEMU in addition to other default arguments.
+
+OPTIONS:
+
+  -g             debug the kernel with GDB
+  -h             show this help
 " 1>&2
 }
 
@@ -35,7 +39,6 @@ while getopts gh OPT; do
       ;;
   esac
 done
-
 shift "$(($OPTIND - 1))"
 
 if [ ! -e "$rootfs_path" ]; then
@@ -67,10 +70,10 @@ make bzImage -j $(grep ^processor /proc/cpuinfo | wc -l)
 
 if $debug; then
   qemu-system-x86_64 -enable-kvm -kernel "$bzimage_path" \
-                     -initrd "$rootfs_path" -S -s &>/dev/null &
+                     -initrd "$rootfs_path" -S -s &>/dev/null "$@" &
   gdb -ex "add-auto-load-safe-path ${vmlinux_path}-gdb.py" \
       -ex "file ${vmlinux_path}" \
       -ex 'target remote localhost:1234'
 else
-  qemu-system-x86_64 -enable-kvm -kernel "$bzimage_path" -initrd "$rootfs_path"
+  qemu-system-x86_64 -enable-kvm -kernel "$bzimage_path" -initrd "$rootfs_path" "$@"
 fi
