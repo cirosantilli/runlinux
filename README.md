@@ -8,7 +8,7 @@ Tested in Ubuntu 14.04 AMD64, QEMU 2.0.0.
 
 ## Install
 
-    sudo apt-get install git qemu
+    sudo apt-get install git qemu xorriso
     sudo apt-get build-dep busybox linux-image-$(uname -r)
     mkdir -p ~/bin
     cd ~/bin
@@ -44,6 +44,33 @@ Pass extra options to QEMU:
     runlinux -- -bios ~/path/to/OVMF.fd
 
 This for example uses the [OVMF UEFI X64 r15214](https://sourceforge.net/projects/edk2/files/OVMF/OVMF-X64-r15214.zip/download) instead of the default BIOS.
+
+### Run on real hardware
+
+Generate a `main.img` file in your build directory:
+
+    runlinux -i
+
+Insert an USB and determine its device (`/dev/sdX`):
+
+    sudo lsblk
+    sudo fdisk -l
+
+Burn the image to the USB:
+
+    sudo dd if=main.img of=/dev/sdX
+
+Then:
+
+- insert the USB in a computer
+- during boot, hit some special hardware dependant key, usually F12, Esc
+- choose to boot from the USB
+
+You can also ensure that the image works fine with:
+
+    qemu-system-x86_64 -enable-kvm -hda main.img
+
+Tested on: ThinkPad T400.
 
 ## Options
 
