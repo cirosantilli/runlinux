@@ -11,8 +11,6 @@ kbuild_output_prefix="${KBUILD_OUTPUT}${KBUILD_OUTPUT:+/}"
 vmlinux_path="${kbuild_output_prefix}vmlinux"
 bzimage_path="${kbuild_output_prefix}arch/x86/boot/bzImage"
 config_path="${kbuild_output_prefix}.config"
-iso_path="${script_dir}/iso"
-boot_path="${iso_path}/boot"
 img_path="${kbuild_output_prefix}/main.img"
 
 # TODO cat README.
@@ -79,9 +77,8 @@ fi
 make bzImage -j $(grep ^processor /proc/cpuinfo | wc -l)
 
 if $img; then
-  cp "$rootfs_path" "${boot_path}"
-  cp "$bzimage_path" "${boot_path}"
-  grub-mkrescue -o "$img_path" "$iso_path"
+  make isoimage FDINITRD="$rootfs_path" -j "$(grep ^processor /proc/cpuinfo | wc -l)"
+  cp "${kbuild_output_prefix}/arch/x86/boot/image.iso" "$img_path"
 else
   if $debug; then
     qemu-system-x86_64 -enable-kvm -kernel "$bzimage_path" \
