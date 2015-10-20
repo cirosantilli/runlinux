@@ -2,13 +2,13 @@
 
 cd into a Linux kernel source tree, run one command, and get a running QEMU VM with BusyBox.
 
-Based on: <https://github.com/ivandavidov/minimal>
+Based on: <https://github.com/ivandavidov/minimal> Merge back declined at: <https://github.com/ivandavidov/minimal/issues/20>
 
 Tested in Ubuntu 14.04 AMD64, QEMU 2.0.0.
 
 ## Install
 
-    sudo apt-get install git qemu xorriso
+    sudo apt-get install git qemu
     sudo apt-get build-dep busybox linux-image-$(uname -r)
     mkdir -p ~/bin
     cd ~/bin
