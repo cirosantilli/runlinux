@@ -5,7 +5,8 @@ set -eu
 # Constants.
 script_dir="$(dirname "${BASH_SOURCE[0]}"})"
 minimal_path="${script_dir}/minimal/src"
-rootfs_path="${minimal_path}/work/rootfs.cpio.gz"
+work_path="${minimal_path}/work"
+rootfs_path="${work_path}/rootfs.cpio.gz"
 # Only add `/` if not empty, otherwise absolute paths would be used.
 kbuild_output_prefix="${KBUILD_OUTPUT}${KBUILD_OUTPUT:+/}"
 vmlinux_path="${kbuild_output_prefix}vmlinux"
@@ -24,17 +25,27 @@ QEMU ARGS are passed directly to QEMU in addition to other default arguments.
 
 OPTIONS:
 
-  -g  debug the kernel with GDB
-  -h  show this help
-  -i  generate USB bootable $img_path instead of emulating
+  -c       rebuild BusyBox and rootfs. Useful to hack it quick and dirty.
+  -g       debug the kernel with GDB
+  -h       show this help
+  -i       generate USB bootable image to $img_path instead of emulating
+  -n<path> use custom initrd file
+  -r       rebuild rootfs, but not BusyBox. Useful to hack it quick
+           and dirty without touching BusyBox.
 " 1>&2
 }
 
 # Parse command line arguments.
+clean_rootfs=false
 debug=false
 img=false
-while getopts ghi OPT; do
+regen_rootfs=false
+init=''
+while getopts cghin:r OPT; do
   case "$OPT" in
+    c)
+      clean_rootfs=true
+      ;;
     g)
       debug=true
       ;;
@@ -45,22 +56,55 @@ while getopts ghi OPT; do
     i)
       img=true
       ;;
+    n)
+      init="$OPTARG"
+      ;;
+    r)
+      regen_rootfs=true
+      ;;
   esac
 done
 shift "$(($OPTIND - 1))"
 
-if [ ! -e "$rootfs_path" ]; then
-  (
-    # BusyBox also uses KBUILD_OUTPUT...
-    unset KBUILD_OUTPUT
-    cd "$minimal_path"
-    ./0_prepare.sh
-    ./3_get_busybox.sh
-    ./4_build_busybox.sh
-    ./5_generate_rootfs.sh
-    ./6_pack_rootfs.sh
-    cd -
-  )
+if $clean_rootfs || $regen_rootfs; then
+  rm -f "$rootfs_path"
+fi
+
+if [ -n "$init" ]; then
+  # Change name to avoid overwriting the BusyBox one.
+  rootfs_path="${rootfs_path}_custom.cpio.gz"
+  if [ -d "$init" ]; then
+    (
+      cd "$init"
+      find . | cpio -H newc -o | gzip > "$rootfs_path"
+    )
+  elif [ -f "$init" ]; then
+    # TODO if file ends in .cpio.gz, just use it directly.
+    (
+      mkdir -p "$work_path/single_file"
+      cp "$init" "$work_path/single_file/init"
+      cd "$work_path/single_file"
+      printf ".\n./init\n" find . | cpio -H newc -o | gzip > "$rootfs_path"
+    )
+  else
+    exit 1
+  fi
+else
+  if [ ! -e "$rootfs_path" ]; then
+    (
+      # BusyBox also uses KBUILD_OUTPUT...
+      unset KBUILD_OUTPUT
+      cd "$minimal_path"
+      if ! $regen_rootfs; then
+        ./0_prepare.sh
+        ./3_get_busybox.sh
+        ./4_build_busybox.sh
+      fi
+      ./5_generate_rootfs.sh
+      ./6_pack_rootfs.sh
+      cd -
+    )
+  fi
 fi
 
 if [ ! -e "$config_path" ]; then

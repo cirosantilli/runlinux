@@ -74,7 +74,26 @@ Tested on: ThinkPad T400.
 
 ## Options
 
-## g
+## Custom initrd
+
+### n
+
+If you just want to run your own root filesystem and ignore BusyBox completely, use:
+
+    runlinux -n /path/to/my/directory/
+    runlinux -n /path/to/my/init
+
+If you pass it:
+
+-   a directory, the directory will be packed into a filesystem.
+
+    The first thing that Linux runs is the `/init` executable of that directory. You usually want that to be an executable without dependencies that never exits.
+
+-   a file, it will be renamed to `init` and put at the root of the packed filesystem.
+
+See [this SO answer](http://superuser.com/a/991733/128124) for more details on how to create your own simple `initrd`.
+
+### g
 
 TODO this is currently broken: <https://sourceware.org/bugzilla/show_bug.cgi?id=13984>
 
