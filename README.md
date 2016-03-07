@@ -74,7 +74,7 @@ Tested on: ThinkPad T400.
 
 ## Options
 
-## Custom initrd
+### Custom initrd
 
 ### n
 
