@@ -95,7 +95,7 @@ See [this SO answer](http://superuser.com/a/991733/128124) for more details on h
 
 ### g
 
-TODO this is currently broken: <https://sourceware.org/bugzilla/show_bug.cgi?id=13984>
+TODO this is currently broken: <https://sourceware.org/bugzilla/show_bug.cgi?id=13984> but I've since found the workaround and just need to stop being lazy and implement it: <http://stackoverflow.com/questions/11408041/how-to-debug-the-linux-kernel-with-gdb-and-qemu/33203642#33203642>
 
 Debug the kernel on GDB:
 
